@@ -116,7 +116,7 @@
                 {
                     "name": "",
                     "id": "1d95decc-7a79-4feb-bcd6-1215abb22ed2",
-                    "path": "<Gyroscope>/angularVelocity",
+                    "path": "<MagneticFieldSensor>/magneticField",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -160,7 +160,7 @@
                 {
                     "name": "left",
                     "id": "1df4b668-df91-4de3-8d29-0d2e51244b49",
-                    "path": "<Keyboard>/q",
+                    "path": "",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -171,7 +171,7 @@
                 {
                     "name": "right",
                     "id": "7cb9999f-086b-4803-ae79-51bd03c218df",
-                    "path": "<Keyboard>/e",
+                    "path": "",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -182,7 +182,7 @@
                 {
                     "name": "forward",
                     "id": "b738eaff-3b8b-48f9-be94-4a25d662a419",
-                    "path": "",
+                    "path": "<Keyboard>/q",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -193,7 +193,7 @@
                 {
                     "name": "backward",
                     "id": "1fd08ae2-1ea2-40c2-ab3e-b3d2cbe32c7a",
-                    "path": "",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
