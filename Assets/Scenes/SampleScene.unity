@@ -875,12 +875,8 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -4509496840534898691, guid: 843e1fdec36629e25b7ed0f42c8626f3, type: 3}
-      propertyPath: width
-      value: 21
-      objectReference: {fileID: 0}
-    - target: {fileID: -4509496840534898691, guid: 843e1fdec36629e25b7ed0f42c8626f3, type: 3}
-      propertyPath: height
-      value: 21
+      propertyPath: tileSize
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 6165101877978260051, guid: 843e1fdec36629e25b7ed0f42c8626f3, type: 3}
       propertyPath: m_Name
@@ -1062,7 +1058,7 @@ Transform:
   m_GameObject: {fileID: 1546983564}
   serializedVersion: 2
   m_LocalRotation: {x: 0.49999994, y: -0.50000006, z: 0.50000006, w: 0.50000006}
-  m_LocalPosition: {x: 0, y: 20, z: 0}
+  m_LocalPosition: {x: 0, y: 100, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1082,7 +1078,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4133792271181241481, guid: f6d876b5b84b82f1babde6617787c934, type: 3}
       propertyPath: moveSpeed
-      value: 0
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4133792271181241481, guid: f6d876b5b84b82f1babde6617787c934, type: 3}
       propertyPath: rotateSpeed

@@ -6,7 +6,12 @@ public class MapGenerator : MonoBehaviour
     public int width = 20;
     public int height = 20;
     
-    public bool positionPlayerAtEnd = true;
+    public bool positionPlayerAtStart = true;
+
+    [Range(0, 100)]
+    public float randomWallRemovalPercentage = 0;
+
+    public float tileSize = 1.0f;
 
     private int[,] maze;
 
@@ -15,9 +20,9 @@ public class MapGenerator : MonoBehaviour
         GenerateMaze();
         DrawMaze();
 
-        if (positionPlayerAtEnd)
+        if (positionPlayerAtStart)
         {
-            PositionPlayerAtEnd(); // Rename to reflect the new behavior
+            PositionPlayerAtStart();
         }
     }
 
@@ -28,23 +33,20 @@ public class MapGenerator : MonoBehaviour
         {
             for (int y = 0; y < height; y++)
             {
-                maze[x, y] = 1; // Initialize all cells as walls
+                maze[x, y] = 1;
             }
         }
 
-        // Start recursive backtracking from a random cell
         CarvePassages(1, 1);
-
-        // Add exit
         maze[0, 1] = 0;
+        RemoveRandomWalls();
     }
 
     private void CarvePassages(int x, int y)
     {
-        maze[x, y] = 0; // Mark the current cell as a passage
+        maze[x, y] = 0;
 
-        // Randomize the directions to explore
-        int[] directions = { 0, 1, 2, 3 }; // 0 = up, 1 = right, 2 = down, 3 = left
+        int[] directions = { 0, 1, 2, 3 };
         System.Random rng = new();
         directions = directions.OrderBy(d => rng.Next()).ToArray();
 
@@ -52,50 +54,79 @@ public class MapGenerator : MonoBehaviour
         {
             int nx = x, ny = y;
 
-            // Determine the next cell based on the direction
             switch (direction)
             {
-                case 0: ny -= 2; break; // Up
-                case 1: nx += 2; break; // Right
-                case 2: ny += 2; break; // Down
-                case 3: nx -= 2; break; // Left
+                case 0: ny -= 2; break;
+                case 1: nx += 2; break;
+                case 2: ny += 2; break;
+                case 3: nx -= 2; break;
             }
 
-            // Check if the next cell is within bounds and is a wall
             if (nx > 0 && nx < width - 1 && ny > 0 && ny < height - 1 && maze[nx, ny] == 1)
             {
-                // Carve a passage between the current cell and the next cell
                 maze[(x + nx) / 2, (y + ny) / 2] = 0;
                 CarvePassages(nx, ny);
             }
         }
     }
 
+    private void RemoveRandomWalls()
+    {
+        System.Random rng = new();
+        var wallPositions = new System.Collections.Generic.List<(int x, int y)>();
+        for (int x = 1; x < width - 1; x++)
+        {
+            for (int y = 1; y < height - 1; y++)
+            {
+                if (maze[x, y] == 1 && HasTwoOppositeNeighbors(x, y))
+                {
+                    wallPositions.Add((x, y));
+                }
+            }
+        }
+
+        wallPositions = wallPositions.OrderBy(_ => rng.Next()).ToList();
+        int wallsToRemove = Mathf.RoundToInt(wallPositions.Count * (randomWallRemovalPercentage / 100f));
+
+        for (int i = 0; i < wallsToRemove; i++)
+        {
+            var (x, y) = wallPositions[i];
+            maze[x, y] = 0;
+        }
+    }
+
+    private bool HasTwoOppositeNeighbors(int x, int y)
+    {
+        bool horizontal = maze[x - 1, y] == 0 && maze[x + 1, y] == 0;
+        bool vertical = maze[x, y - 1] == 0 && maze[x, y + 1] == 0;
+        return horizontal || vertical;
+    }
+
     private void DrawMaze()
     {
-        Vector3 offset = new(-width / 2f + 0.5f, 0, -height / 2f + 0.5f); // Adjust offset by half a tile
+        Vector3 offset = new(-width * tileSize / 2f + tileSize / 2f, 0, -height * tileSize / 2f + tileSize / 2f);
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
                 if (maze[x, y] == 1)
                 {
-                    // Instantiate a wall prefab at this position
                     GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    wall.transform.position = new Vector3(x, 0, y) + offset; // Apply the corrected offset
+                    wall.transform.position = new Vector3(x * tileSize, 0, y * tileSize) + offset;
+                    wall.transform.localScale = new Vector3(tileSize, tileSize, tileSize); // Scale the wall to match the tile size
                     wall.transform.parent = transform;
                 }
             }
         }
     }
 
-    private void PositionPlayerAtEnd()
+    private void PositionPlayerAtStart()
     {
-        Player player = FindFirstObjectByType<Player>(); // Use FindFirstObjectByType to locate the player with the Player component
+        Player player = FindFirstObjectByType<Player>();
         if (player != null)
         {
-            Vector3 offset = new Vector3(-width / 2f + 0.5f, 0, -height / 2f + 0.5f); // Adjust offset by half a tile
-            player.transform.position = new Vector3(width - 2, 0, height - 2) + offset; // Position player at the end (width-2, height-2)
+            Vector3 offset = new(-width * tileSize / 2f + tileSize / 2f, 0, -height * tileSize / 2f + tileSize / 2f);
+            player.transform.position = new Vector3((width - 2) * tileSize, 0, (height - 2) * tileSize) + offset;
         }
         else
         {
