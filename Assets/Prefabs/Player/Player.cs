@@ -1,10 +1,16 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
+    public InputActionReference moveAction;
+    public InputActionReference rotateAction;
+
     public float moveSpeed = 5f;
+
     public float deadzone = 0.05f;
+
     private Quaternion initialGyroRotation;
 
     void OnEnable()

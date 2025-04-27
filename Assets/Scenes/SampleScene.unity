@@ -963,6 +963,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 4133792271181241481, guid: f6d876b5b84b82f1babde6617787c934, type: 3}
+      propertyPath: moveAction
+      value: 
+      objectReference: {fileID: 8193960232071775979, guid: c0b8949393f4826488fc632b5cde2b42, type: 3}
+    - target: {fileID: 4133792271181241481, guid: f6d876b5b84b82f1babde6617787c934, type: 3}
+      propertyPath: rotateAction
+      value: 
+      objectReference: {fileID: 117124188738500858, guid: c0b8949393f4826488fc632b5cde2b42, type: 3}
     - target: {fileID: 5963742832506711424, guid: f6d876b5b84b82f1babde6617787c934, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

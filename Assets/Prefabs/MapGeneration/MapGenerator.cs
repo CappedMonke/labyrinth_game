@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Linq;
-using UnityEditor; // Add this for custom inspector functionality
+using UnityEditor;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -115,7 +115,7 @@ public class MapGenerator : MonoBehaviour
                 {
                     GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     wall.transform.position = new Vector3(x * tileSize, tileSize / 2f, y * tileSize) + offset;
-                    wall.transform.localScale = new Vector3(tileSize, tileSize, tileSize); // Scale the wall to match the tile size
+                    wall.transform.localScale = new Vector3(tileSize, tileSize, tileSize);
                     wall.transform.parent = transform;
                 }
             }
@@ -158,8 +158,8 @@ public class MapGenerator : MonoBehaviour
         Camera mainCamera = Camera.main;
         if (mainCamera != null)
         {
-            float mazeWidth = width * tileSize;
-            float mazeHeight = height * tileSize;
+            float mazeWidth = (width + 2) * tileSize;
+            float mazeHeight = (height + 2) * tileSize;
 
             float aspectRatio = (float)Screen.width / Screen.height;
             if (aspectRatio >= 1)
@@ -171,7 +171,7 @@ public class MapGenerator : MonoBehaviour
                 mainCamera.orthographicSize = mazeWidth / (2f * aspectRatio);
             }
 
-            mainCamera.transform.position = new Vector3(0, Mathf.Max(mazeWidth, mazeHeight), 0);
+            mainCamera.transform.position = new Vector3(0, Mathf.Max(mazeWidth, mazeHeight) / 2f, 0);
             mainCamera.orthographic = true;
         }
         else
