@@ -4,14 +4,11 @@ using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
 {
-    public InputActionReference moveAction;
-    public InputActionReference rotateAction;
-
     public float moveSpeed = 5f;
-
     public float deadzone = 0.05f;
 
     private Quaternion initialGyroRotation;
+    private float accumulatedYaw = 0f;
 
     void OnEnable()
     {
@@ -22,7 +19,7 @@ public class Player : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
         Input.gyro.enabled = true;
-        initialGyroRotation = Input.gyro.attitude; // Store the initial gyroscope rotation
+        initialGyroRotation = Input.gyro.attitude;
     }
 
     void OnDisable()
@@ -32,13 +29,11 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Movement using accelerometer
         Vector3 acceleration = Input.acceleration;
         Vector2 horizontalAcceleration = (Vector2)acceleration;
 
         if (horizontalAcceleration.magnitude > deadzone)
         {
-            // Corrected movement relative to the player's forward direction
             Vector3 forwardMovement = -acceleration.y * moveSpeed * Time.deltaTime * transform.right;
             Vector3 rightMovement = acceleration.x * moveSpeed * Time.deltaTime * transform.forward;
             Vector3 movement = forwardMovement + rightMovement;
@@ -46,15 +41,27 @@ public class Player : MonoBehaviour
             transform.Translate(movement, Space.World);
         }
 
-        // Rotation using gyroscope
+        Vector3 keyboardMovement = Vector3.zero;
+        if (Input.GetKey(KeyCode.W)) keyboardMovement -= transform.right;
+        if (Input.GetKey(KeyCode.S)) keyboardMovement += transform.right;
+        if (Input.GetKey(KeyCode.A)) keyboardMovement -= transform.forward;
+        if (Input.GetKey(KeyCode.D)) keyboardMovement += transform.forward;
+
+        transform.Translate(moveSpeed * Time.deltaTime * keyboardMovement, Space.World);
+
         Quaternion gyroRotation = Input.gyro.attitude;
         Quaternion relativeRotation = Quaternion.Inverse(initialGyroRotation) * gyroRotation;
         Vector3 adjustedEulerAngles = relativeRotation.eulerAngles;
-        float yaw = -adjustedEulerAngles.z;
-        transform.rotation = Quaternion.Euler(0, yaw, 0);
+        float gyroYaw = -adjustedEulerAngles.z;
 
-        string formattedMove = $"Move: {acceleration.x:F2}, {acceleration.y:F2}";
-        string formattedRotate = $"Rotate: Yaw {yaw:F2}";
+        if (Input.GetKey(KeyCode.Q)) accumulatedYaw -= 3f;
+        if (Input.GetKey(KeyCode.E)) accumulatedYaw += 3f;
+
+        float finalYaw = gyroYaw + accumulatedYaw;
+        transform.rotation = Quaternion.Euler(0, finalYaw, 0);
+
+        string formattedMove = $"Move: {acceleration.x + keyboardMovement.x:F2}, {acceleration.y + keyboardMovement.z:F2}";
+        string formattedRotate = $"Rotate: Yaw {finalYaw:F2}";
 
         UIManager.Instance.SetMoveText(formattedMove);
         UIManager.Instance.SetRotateText(formattedRotate);
