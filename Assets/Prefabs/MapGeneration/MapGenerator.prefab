@@ -44,7 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e5ac3eb2e71f9e1fbac6d2163ee73e5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 21
-  height: 21
-  positionPlayerAtEnd: 1
+  width: 15
+  height: 15
+  positionPlayerAtStart: 1
   randomWallRemovalPercentage: 6
+  tileSize: 4

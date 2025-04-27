@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Linq;
+using UnityEditor; // Add this for custom inspector functionality
 
 public class MapGenerator : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class MapGenerator : MonoBehaviour
     {
         GenerateMaze();
         DrawMaze();
+        AdjustCamera();
 
         if (positionPlayerAtStart)
         {
@@ -112,7 +114,7 @@ public class MapGenerator : MonoBehaviour
                 if (maze[x, y] == 1)
                 {
                     GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    wall.transform.position = new Vector3(x * tileSize, 0, y * tileSize) + offset;
+                    wall.transform.position = new Vector3(x * tileSize, tileSize / 2f, y * tileSize) + offset;
                     wall.transform.localScale = new Vector3(tileSize, tileSize, tileSize); // Scale the wall to match the tile size
                     wall.transform.parent = transform;
                 }
@@ -126,11 +128,55 @@ public class MapGenerator : MonoBehaviour
         if (player != null)
         {
             Vector3 offset = new(-width * tileSize / 2f + tileSize / 2f, 0, -height * tileSize / 2f + tileSize / 2f);
-            player.transform.position = new Vector3((width - 2) * tileSize, 0, (height - 2) * tileSize) + offset;
+            player.transform.position = new Vector3((width - 2) * tileSize, player.transform.position.y, (height - 2) * tileSize) + offset;
         }
         else
         {
             Debug.LogWarning("Player object with 'Player' component not found.");
+        }
+    }
+
+    public void RegenerateLabyrinth()
+    {
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        GenerateMaze();
+        DrawMaze();
+        AdjustCamera();
+
+        if (positionPlayerAtStart)
+        {
+            PositionPlayerAtStart();
+        }
+    }
+
+    private void AdjustCamera()
+    {
+        Camera mainCamera = Camera.main;
+        if (mainCamera != null)
+        {
+            float mazeWidth = width * tileSize;
+            float mazeHeight = height * tileSize;
+
+            float aspectRatio = (float)Screen.width / Screen.height;
+            if (aspectRatio >= 1)
+            {
+                mainCamera.orthographicSize = mazeHeight / 2f;
+            }
+            else
+            {
+                mainCamera.orthographicSize = mazeWidth / (2f * aspectRatio);
+            }
+
+            mainCamera.transform.position = new Vector3(0, Mathf.Max(mazeWidth, mazeHeight), 0);
+            mainCamera.orthographic = true;
+        }
+        else
+        {
+            Debug.LogWarning("Main Camera not found. Cannot adjust camera to fit the labyrinth.");
         }
     }
 }
