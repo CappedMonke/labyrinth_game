@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 5625552145877132725}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -47,6 +47,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67658a6091e117c09b9590b10e4c5321, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  moveAction: {fileID: 0}
+  rotateAction: {fileID: 0}
   moveSpeed: 5
   deadzone: 0.05
 --- !u!54 &5625552145877132725
@@ -176,7 +178,7 @@ GameObject:
   - component: {fileID: 7214382058473287352}
   m_Layer: 0
   m_Name: Body
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -1,12 +1,13 @@
 using UnityEngine;
 using System.Linq;
 using UnityEditor;
+using System.Collections;
 
 public class MapGenerator : MonoBehaviour
 {
     public int width = 20;
     public int height = 20;
-    
+
     public bool positionPlayerAtStart = true;
 
     [Range(0, 100)]
@@ -20,12 +21,18 @@ public class MapGenerator : MonoBehaviour
     {
         GenerateMaze();
         DrawMaze();
-        AdjustCamera();
+        StartCoroutine(DelayedAdjustCamera());
 
         if (positionPlayerAtStart)
         {
             PositionPlayerAtStart();
         }
+    }
+
+    private IEnumerator DelayedAdjustCamera()
+    {
+        yield return new WaitForSeconds(1f); // Wait for 1 second to account for remote connection
+        AdjustCamera();
     }
 
     private void GenerateMaze()
@@ -40,7 +47,6 @@ public class MapGenerator : MonoBehaviour
         }
 
         CarvePassages(1, 1);
-        maze[0, 1] = 0;
         RemoveRandomWalls();
     }
 
@@ -117,6 +123,17 @@ public class MapGenerator : MonoBehaviour
                     wall.transform.position = new Vector3(x * tileSize, tileSize / 2f, y * tileSize) + offset;
                     wall.transform.localScale = new Vector3(tileSize, tileSize, tileSize);
                     wall.transform.parent = transform;
+
+                    // Make the destination tile
+                    if (x == 0 && y == 1)
+                    {
+                        // Add a trigger collider to the destination tile
+                        BoxCollider collider = wall.AddComponent<BoxCollider>();
+                        collider.isTrigger = true;
+
+                        // Add a script to handle collision with the player
+                        wall.AddComponent<DestinationTile>();
+                    }
                 }
             }
         }
