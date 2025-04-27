@@ -46,10 +46,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67658a6091e117c09b9590b10e4c5321, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveAction: {fileID: 8193960232071775979, guid: c0b8949393f4826488fc632b5cde2b42, type: 3}
-  rotateAction: {fileID: 117124188738500858, guid: c0b8949393f4826488fc632b5cde2b42, type: 3}
   moveSpeed: 5
-  rotateSpeed: 100
+  deadzone: 0.05
 --- !u!1 &2391866963531613381
 GameObject:
   m_ObjectHideFlags: 0
