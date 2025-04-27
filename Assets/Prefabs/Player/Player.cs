@@ -32,7 +32,11 @@ public class Player : MonoBehaviour
 
         if (horizontalAcceleration.magnitude > deadzone)
         {
-            Vector3 movement = moveSpeed * Time.deltaTime * new Vector3(-acceleration.y, 0, acceleration.x);
+            // Corrected movement relative to the player's forward direction
+            Vector3 forwardMovement = -acceleration.y * moveSpeed * Time.deltaTime * transform.right;
+            Vector3 rightMovement = acceleration.x * moveSpeed * Time.deltaTime * transform.forward;
+            Vector3 movement = forwardMovement + rightMovement;
+
             transform.Translate(movement, Space.World);
         }
 
