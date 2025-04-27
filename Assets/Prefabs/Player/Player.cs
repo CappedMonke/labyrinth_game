@@ -1,57 +1,52 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
+using System.Collections;
 
 public class Player : MonoBehaviour
 {
-    public InputActionReference moveAction;
-    public InputActionReference rotateAction;
-
     public float moveSpeed = 5f;
-
-    public float deadzone = 0.1f; // Define a deadzone threshold
+    public float deadzone = 0.05f;
+    private Quaternion initialGyroRotation;
 
     void OnEnable()
     {
-        var magneticFieldSensor = MagneticFieldSensor.current;
-        if (magneticFieldSensor != null)
-        {
-            InputSystem.EnableDevice(magneticFieldSensor);
-        }
+        StartCoroutine(InitializeComponents());
+    }
 
-        var accelerometer = Accelerometer.current;
-        if (accelerometer != null)
-        {
-            InputSystem.EnableDevice(accelerometer);
-        }
-
-        moveAction.action.Enable();
-        rotateAction.action.Enable();
+    IEnumerator InitializeComponents()
+    {
+        yield return new WaitForSeconds(1f);
+        Input.gyro.enabled = true;
+        initialGyroRotation = Input.gyro.attitude; // Store the initial gyroscope rotation
     }
 
     void OnDisable()
     {
-        moveAction.action.Disable();
-        rotateAction.action.Disable();
+        Input.gyro.enabled = false;
     }
 
     void FixedUpdate()
     {
-        Vector3 moveValue = moveAction.action.ReadValue<Vector3>();
-        Vector3 rotateValue = rotateAction.action.ReadValue<Vector3>();
+        // Movement using accelerometer
+        Vector3 acceleration = Input.acceleration;
+        Vector2 horizontalAcceleration = (Vector2)acceleration;
 
-        // Apply deadzone to moveValue
-        if (Mathf.Abs(moveValue.x) < deadzone) moveValue.x = 0;
-        if (Mathf.Abs(moveValue.y) < deadzone) moveValue.y = 0;
-
-        if (moveValue != Vector3.zero)
+        if (horizontalAcceleration.magnitude > deadzone)
         {
-            Vector3 moveDirection = new(moveValue.x, 0, moveValue.y);
-            transform.position += moveSpeed * Time.fixedDeltaTime * moveDirection;
+            Vector3 movement = moveSpeed * Time.deltaTime * new Vector3(-acceleration.y, 0, acceleration.x);
+            transform.Translate(movement, Space.World);
         }
 
-        transform.Rotate(0, -rotateValue.z, 0);
+        // Rotation using gyroscope
+        Quaternion gyroRotation = Input.gyro.attitude;
+        Quaternion relativeRotation = Quaternion.Inverse(initialGyroRotation) * gyroRotation;
+        Vector3 adjustedEulerAngles = relativeRotation.eulerAngles;
+        float yaw = -adjustedEulerAngles.z;
+        transform.rotation = Quaternion.Euler(0, yaw, 0);
 
-        UIManager.Instance.SetMoveText($"Move: {moveValue}");
-        UIManager.Instance.SetRotateText($"Rotate: {rotateValue}");
+        string formattedMove = $"Move: {acceleration.x:F2}, {acceleration.y:F2}";
+        string formattedRotate = $"Rotate: Yaw {yaw:F2}";
+
+        UIManager.Instance.SetMoveText(formattedMove);
+        UIManager.Instance.SetRotateText(formattedRotate);
     }
 }
