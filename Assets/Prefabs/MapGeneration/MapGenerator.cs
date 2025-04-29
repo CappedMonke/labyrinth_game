@@ -15,6 +15,8 @@ public class MapGenerator : MonoBehaviour
 
     public float tileSize = 1.0f;
 
+    public Material wallMaterial;
+
     private int[,] maze;
 
     private void Start()
@@ -31,7 +33,7 @@ public class MapGenerator : MonoBehaviour
 
     private IEnumerator DelayedAdjustCamera()
     {
-        yield return new WaitForSeconds(1f); // Wait for 1 second to account for remote connection
+        yield return new WaitForSeconds(1f);
         AdjustCamera();
     }
 
@@ -124,6 +126,12 @@ public class MapGenerator : MonoBehaviour
                     wall.transform.localScale = new Vector3(tileSize, tileSize, tileSize);
                     wall.transform.parent = transform;
 
+                    if (wallMaterial != null)
+                    {
+                        Renderer renderer = wall.GetComponent<Renderer>();
+                        renderer.material = wallMaterial;
+                    }
+
                     // Make the destination tile
                     if (x == 0 && y == 1)
                     {
@@ -175,8 +183,8 @@ public class MapGenerator : MonoBehaviour
         Camera mainCamera = Camera.main;
         if (mainCamera != null)
         {
-            float mazeWidth = (width + 2) * tileSize;
-            float mazeHeight = (height + 2) * tileSize;
+            float mazeWidth = width * tileSize;
+            float mazeHeight = height * tileSize;
 
             float aspectRatio = (float)Screen.width / Screen.height;
             if (aspectRatio >= 1)
@@ -188,8 +196,8 @@ public class MapGenerator : MonoBehaviour
                 mainCamera.orthographicSize = mazeWidth / (2f * aspectRatio);
             }
 
-            mainCamera.transform.position = new Vector3(0, Mathf.Max(mazeWidth, mazeHeight) / 2f, 0);
-            mainCamera.orthographic = true;
+            // Position the camera above the center of the maze
+            mainCamera.transform.position = new Vector3(0, Mathf.Max(mazeWidth, mazeHeight), 0);
         }
         else
         {
