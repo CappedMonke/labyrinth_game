@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI TileSizeText;
     public TextMeshProUGUI RandomWallRemovalText;
 
+    public Button MakeSoundButton;
+
     public Slider WidthSlider;
     public Slider HeightSlider;
     public Slider TileSizeSlider;
@@ -43,11 +45,17 @@ public class UIManager : MonoBehaviour
     {
         mapGenerator = FindFirstObjectByType<MapGenerator>();
 
+        MakeSoundButton.onClick.AddListener(OnMakeSoundButtonClicked);
         RegenerateButton.onClick.AddListener(OnRegenerateButtonClicked);
         WidthSlider.onValueChanged.AddListener(OnWidthSliderChanged);
         HeightSlider.onValueChanged.AddListener(OnHeightSliderChanged);
         TileSizeSlider.onValueChanged.AddListener(OnTileSizeSliderChanged);
         RandomWallRemovalSlider.onValueChanged.AddListener(OnRandomWallRemovalSliderChanged);
+    }
+
+    private void OnMakeSoundButtonClicked()
+    {
+        // Implement sound button functionality here
     }
 
     private void OnRandomWallRemovalSliderChanged(float arg0)
