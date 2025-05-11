@@ -1,5 +1,7 @@
 using System;
+using Unity.Android.Gradle.Manifest;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
@@ -18,22 +20,35 @@ public class Player : MonoBehaviour
 
     private Vector2 moveInputKeyboard;
     private Vector3 moveInputMobile;
-    private Vector2 rotateInputKeyboard;
+    private float rotateInputKeyboard;
     private Quaternion rotateInputMobile;
+
+    private Rigidbody rb;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     private void OnEnable()
     {
+        if (SystemInfo.deviceType == DeviceType.Handheld)
+        {
+            InputSystem.EnableDevice(Accelerometer.current);
+            InputSystem.EnableDevice(UnityEngine.InputSystem.Gyroscope.current);
+        }
+
         moveActionKeyboard.action.performed += ctx => moveInputKeyboard = ctx.ReadValue<Vector2>();
         moveActionKeyboard.action.canceled += ctx => moveInputKeyboard = Vector2.zero;
         moveActionKeyboard.action.Enable();
 
+        rotateActionKeyboard.action.performed += ctx => rotateInputKeyboard = ctx.ReadValue<float>();
+        rotateActionKeyboard.action.canceled += ctx => rotateInputKeyboard = 0f;
+        rotateActionKeyboard.action.Enable();
+
         moveActionPhone.action.performed += ctx => moveInputMobile = ctx.ReadValue<Vector3>();
         moveActionPhone.action.canceled += ctx => moveInputMobile = Vector3.zero;
         moveActionPhone.action.Enable();
-
-        rotateActionKeyboard.action.performed += ctx => rotateInputKeyboard = ctx.ReadValue<Vector2>();
-        rotateActionKeyboard.action.canceled += ctx => rotateInputKeyboard = Vector2.zero;
-        rotateActionKeyboard.action.Enable();
 
         rotateActionPhone.action.performed += ctx => rotateInputMobile = ctx.ReadValue<Quaternion>();
         rotateActionPhone.action.canceled += ctx => rotateInputMobile = Quaternion.identity;
@@ -42,9 +57,15 @@ public class Player : MonoBehaviour
 
     private void OnDisable()
     {
+        if (SystemInfo.deviceType == DeviceType.Handheld)
+        {
+            InputSystem.DisableDevice(Accelerometer.current);
+            InputSystem.DisableDevice(UnityEngine.InputSystem.Gyroscope.current);
+        }
+
         moveActionKeyboard.action.Disable();
-        moveActionPhone.action.Disable();
         rotateActionKeyboard.action.Disable();
+        moveActionPhone.action.Disable();
         rotateActionPhone.action.Disable();
     }
 
@@ -77,13 +98,16 @@ public class Player : MonoBehaviour
             moveVector.x *= (hozizontalSpeed / speed);
         }
 
-        transform.Translate(currentSpeed * Time.deltaTime * moveVector, Space.World);
+        Vector3 adjustedMoveVector = rb.rotation * moveVector;
+
+        Vector3 newPosition = rb.position + currentSpeed * Time.deltaTime * adjustedMoveVector;
+        rb.MovePosition(newPosition);
 
         float yaw = 0f;
 
-        if (rotateInputKeyboard != Vector2.zero)
+        if (rotateInputKeyboard != 0f)
         {
-            yaw = rotateInputKeyboard.x * 10f;
+            yaw = rotateInputKeyboard * 250f;
         }
         else if (rotateInputMobile != Quaternion.identity)
         {
@@ -91,6 +115,19 @@ public class Player : MonoBehaviour
             yaw = euler.y;
         }
 
-        transform.Rotate(0, yaw * Time.deltaTime, 0);
+        rb.MoveRotation(rb.rotation * Quaternion.Euler(0, yaw * Time.deltaTime, 0));
+
+        UiManager.Instance.UpdateInputTexts(moveInputKeyboard, rotateInputKeyboard, moveInputMobile, rotateInputMobile);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+    }
+
+    private void OnCollisionStay(Collision collision)
+    {
+        rb.linearVelocity = Vector3.zero;
     }
 }

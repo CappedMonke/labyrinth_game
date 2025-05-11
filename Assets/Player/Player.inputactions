@@ -15,19 +15,19 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "MoveMobile",
+                    "name": "RotateKeyboard",
                     "type": "Value",
-                    "id": "dd0f54a5-398d-4a35-ad0a-2738ad2b88a8",
-                    "expectedControlType": "Vector3",
+                    "id": "b1c2a5e5-08b9-4ce9-a7fd-802932b364dc",
+                    "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
                 },
                 {
-                    "name": "RotateKeyboard",
+                    "name": "MoveMobile",
                     "type": "Value",
-                    "id": "b1c2a5e5-08b9-4ce9-a7fd-802932b364dc",
-                    "expectedControlType": "Vector2",
+                    "id": "dd0f54a5-398d-4a35-ad0a-2738ad2b88a8",
+                    "expectedControlType": "Vector3",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -100,17 +100,6 @@
                 },
                 {
                     "name": "",
-                    "id": "dc901f68-4606-4258-bf30-7dd27deeca26",
-                    "path": "<Mouse>/delta",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": ";Keyboard",
-                    "action": "RotateKeyboard",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "e8ded3df-e804-4a7a-b40d-076cde0c0ba1",
                     "path": "<Accelerometer>/acceleration",
                     "interactions": "",
@@ -130,6 +119,39 @@
                     "action": "RotateMobile",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "1D Axis",
+                    "id": "3376ed2c-b56e-4a33-a9cc-c69c9fb439dc",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RotateKeyboard",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "2f0ba6de-e5a0-4209-8d37-648536ff71c3",
+                    "path": "<Keyboard>/q",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "RotateKeyboard",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "5883c995-3040-4b5e-8e4c-bacc3beb3be7",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard",
+                    "action": "RotateKeyboard",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
