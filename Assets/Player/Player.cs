@@ -1,7 +1,4 @@
-using System;
-using Unity.Android.Gradle.Manifest;
 using UnityEngine;
-using UnityEngine.Animations;
 using UnityEngine.InputSystem;
 
 public class Player : MonoBehaviour
@@ -79,7 +76,7 @@ public class Player : MonoBehaviour
         }
         else if (moveInputMobile != Vector3.zero)
         {
-            moveVector = new Vector3(moveInputMobile.x, 0, moveInputMobile.z);
+            moveVector = new Vector3(moveInputMobile.x, 0, moveInputMobile.y);
         }
 
         float currentSpeed = speed;
