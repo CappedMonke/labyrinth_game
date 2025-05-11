@@ -21,10 +21,14 @@ public class Player : MonoBehaviour
     private Quaternion rotateInputMobile;
 
     private Rigidbody rb;
+    private Quaternion initialRotation;
+    private Quaternion initialPhoneRotation;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        initialRotation = rb.rotation;
+        initialPhoneRotation = Quaternion.identity;
     }
 
     private void OnEnable()
@@ -32,7 +36,7 @@ public class Player : MonoBehaviour
         if (SystemInfo.deviceType == DeviceType.Handheld)
         {
             InputSystem.EnableDevice(Accelerometer.current);
-            InputSystem.EnableDevice(UnityEngine.InputSystem.Gyroscope.current);
+            InputSystem.EnableDevice(AttitudeSensor.current);
         }
 
         moveActionKeyboard.action.performed += ctx => moveInputKeyboard = ctx.ReadValue<Vector2>();
@@ -47,7 +51,14 @@ public class Player : MonoBehaviour
         moveActionPhone.action.canceled += ctx => moveInputMobile = Vector3.zero;
         moveActionPhone.action.Enable();
 
-        rotateActionPhone.action.performed += ctx => rotateInputMobile = ctx.ReadValue<Quaternion>();
+        rotateActionPhone.action.performed += ctx =>
+        {
+            if (initialPhoneRotation == Quaternion.identity)
+            {
+                initialPhoneRotation = ctx.ReadValue<Quaternion>();
+            }
+            rotateInputMobile = ctx.ReadValue<Quaternion>();
+        };
         rotateActionPhone.action.canceled += ctx => rotateInputMobile = Quaternion.identity;
         rotateActionPhone.action.Enable();
     }
@@ -100,19 +111,15 @@ public class Player : MonoBehaviour
         Vector3 newPosition = rb.position + currentSpeed * Time.deltaTime * adjustedMoveVector;
         rb.MovePosition(newPosition);
 
-        float yaw = 0f;
-
         if (rotateInputKeyboard != 0f)
         {
-            yaw = rotateInputKeyboard * 250f;
+            rb.MoveRotation(rb.rotation * Quaternion.Euler(0, rotateInputKeyboard * 250f * Time.deltaTime, 0));
         }
         else if (rotateInputMobile != Quaternion.identity)
         {
-            Vector3 euler = rotateInputMobile.eulerAngles;
-            yaw = euler.y;
+            Quaternion relativeRotation = Quaternion.Inverse(initialPhoneRotation) * rotateInputMobile;
+            rb.MoveRotation(initialRotation * Quaternion.Euler(0, -relativeRotation.eulerAngles.z, 0));
         }
-
-        rb.MoveRotation(rb.rotation * Quaternion.Euler(0, yaw * Time.deltaTime, 0));
 
         UiManager.Instance.UpdateInputTexts(moveInputKeyboard, rotateInputKeyboard, moveInputMobile, rotateInputMobile);
     }
