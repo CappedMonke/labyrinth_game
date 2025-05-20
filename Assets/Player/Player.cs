@@ -6,7 +6,7 @@ public class Player : MonoBehaviour
     [Header("Movement Settings")]
     public float speed = 5.0f;
     public float backwardSpeed = 2.0f;
-    public float hozizontalSpeed = 3.0f;
+    public float horizontalSpeed = 3.0f;
     public bool allowHorizontalMovement = true;
 
     [Header("Input Actions")]
@@ -14,6 +14,10 @@ public class Player : MonoBehaviour
     public InputActionReference moveActionPhone;
     public InputActionReference rotateActionKeyboard;
     public InputActionReference rotateActionPhone;
+
+    [Header("Sounds")]
+    public AudioSource audioSource;
+    public AudioClip hitWallSound;
 
     private Vector2 moveInputKeyboard;
     private Vector3 moveInputMobile;
@@ -26,11 +30,14 @@ public class Player : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log(RDG.Vibration.GetApiLevel());
+        RDG.Vibration.LogLevel = RDG.Vibration.logLevel.Info;
+
         rb = GetComponent<Rigidbody>();
         initialRotation = rb.rotation;
         initialPhoneRotation = Quaternion.identity;
     }
-
+    
     private void OnEnable()
     {
         if (SystemInfo.deviceType == DeviceType.Handheld)
@@ -103,7 +110,7 @@ public class Player : MonoBehaviour
         }
         else
         {
-            moveVector.x *= (hozizontalSpeed / speed);
+            moveVector.x *= horizontalSpeed / speed;
         }
 
         Vector3 adjustedMoveVector = rb.rotation * moveVector;
@@ -115,7 +122,7 @@ public class Player : MonoBehaviour
         {
             rb.MoveRotation(rb.rotation * Quaternion.Euler(0, rotateInputKeyboard * 250f * Time.deltaTime, 0));
         }
-        else if (rotateInputMobile != Quaternion.identity)
+        else if (rotateInputMobile.x != 0 || rotateInputMobile.y != 0 || rotateInputMobile.z != 0 || rotateInputMobile.w != 0)
         {
             Quaternion relativeRotation = Quaternion.Inverse(initialPhoneRotation) * rotateInputMobile;
             rb.MoveRotation(initialRotation * Quaternion.Euler(0, -relativeRotation.eulerAngles.z, 0));
@@ -128,6 +135,8 @@ public class Player : MonoBehaviour
     {
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        RDG.Vibration.Vibrate(500);
+        audioSource.PlayOneShot(hitWallSound);
     }
 
     private void OnCollisionStay(Collision collision)
